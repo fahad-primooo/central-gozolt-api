@@ -2,7 +2,6 @@ import express from 'express';
 import { errorHandler } from './middlewares/error.middleware';
 import { requestLogger } from './middlewares/logger.middleware';
 import userRoutes from './modules/user/user.routes';
-import { User } from '../generated/prisma/client';
 
 const app = express();
 
