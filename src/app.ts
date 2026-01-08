@@ -12,7 +12,7 @@ app.get('/health', (_, res) => {
 });
 
 // Routes
-app.use('/users', userRoutes);
+app.use('/api/users', userRoutes);
 
 // Global error handler (always last)
 app.use(errorHandler);

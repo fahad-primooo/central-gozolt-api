@@ -16,14 +16,6 @@ export const createUserSchema = z.object({
       .min(5, 'Phone number must be at least 5 digits')
       .max(15, 'Phone number must not exceed 15 digits')
       .regex(/^\d+$/, 'Phone number must contain only digits'),
-    password: z
-      .string()
-      .min(8, 'Password must be at least 8 characters')
-      .max(100)
-      .regex(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-        'Password must contain at least one uppercase letter, one lowercase letter, and one number'
-      ),
     avatar: z.string().url('Invalid avatar URL').optional(),
     bio: z.string().max(500, 'Bio must not exceed 500 characters').optional(),
   }),
