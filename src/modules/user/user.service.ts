@@ -42,6 +42,18 @@ export class UserService {
       throw new ApiError(400, 'User with this email, username, or phone already exists');
     }
 
+    const phoneVerified = await prisma.phoneVerification.findFirst({
+      where: {
+        countryCode: data.countryCode,
+        phoneNumber: data.phoneNumber,
+        verified: true,
+      },
+    });
+
+    if (!phoneVerified) {
+      throw new ApiError(400, 'Phone number not verified. Please complete OTP verification first.');
+    }
+
     // Hash password
     const hashedPassword = await bcrypt.hash(data.password, 10);
 

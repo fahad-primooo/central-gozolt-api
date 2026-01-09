@@ -40,6 +40,8 @@ CREATE TABLE `phone_verifications` (
     `expires_at` DATETIME(3) NOT NULL,
     `attempts` INTEGER NOT NULL DEFAULT 0,
     `max_attempts` INTEGER NOT NULL DEFAULT 5,
+    `channel` VARCHAR(191) NOT NULL DEFAULT 'whatsapp',
+    `verify_sid` VARCHAR(191) NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `verified_at` DATETIME(3) NULL,
 

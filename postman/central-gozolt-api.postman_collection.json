@@ -2,7 +2,7 @@
   "info": {
     "name": "Central Gozolt API",
     "_postman_id": "central-gozolt-api-collection",
-    "description": "API collection for Central Gozolt API - User Management and Authentication",
+    "description": "API collection for Central Gozolt API - User Management, Phone Verification, and Authentication",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -239,6 +239,127 @@
         }
       ],
       "description": "User management endpoints"
+    },
+    {
+      "name": "Phone Verification",
+      "item": [
+        {
+          "name": "Initiate Phone Verification",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contactNumber\": \"3001234567\",\n  \"countryCode\": \"+92\",\n  \"verificationMethod\": \"whatsapp\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/phone-verification/initiate",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "phone-verification", "initiate"]
+            },
+            "description": "Initiate phone verification by sending OTP via WhatsApp or SMS. Checks if user already exists with this phone number."
+          },
+          "response": []
+        },
+        {
+          "name": "Initiate Phone Verification (SMS)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contactNumber\": \"3001234567\",\n  \"countryCode\": \"+92\",\n  \"verificationMethod\": \"sms\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/phone-verification/initiate",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "phone-verification", "initiate"]
+            },
+            "description": "Initiate phone verification by sending OTP via SMS instead of WhatsApp."
+          },
+          "response": []
+        },
+        {
+          "name": "Resend OTP (Switch to SMS)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contactNumber\": \"3001234567\",\n  \"countryCode\": \"+92\",\n  \"verificationMethod\": \"sms\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/phone-verification/resend",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "phone-verification", "resend"]
+            },
+            "description": "Resend OTP code. Can switch from WhatsApp to SMS or vice versa. Limited to 3 resends per 10 minutes."
+          },
+          "response": []
+        },
+        {
+          "name": "Resend OTP (Switch to WhatsApp)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contactNumber\": \"3001234567\",\n  \"countryCode\": \"+92\",\n  \"verificationMethod\": \"whatsapp\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/phone-verification/resend",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "phone-verification", "resend"]
+            },
+            "description": "Resend OTP code via WhatsApp. Can switch from SMS to WhatsApp."
+          },
+          "response": []
+        },
+        {
+          "name": "Verify OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contactNumber\": \"3001234567\",\n  \"countryCode\": \"+92\",\n  \"otp\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/phone-verification/verify",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "phone-verification", "verify"]
+            },
+            "description": "Verify the OTP code sent via WhatsApp or SMS. OTP is valid for 10 minutes."
+          },
+          "response": []
+        }
+      ],
+      "description": "Phone verification endpoints using Twilio Verify API. Supports both WhatsApp and SMS channels with rate limiting."
     },
     {
       "name": "Authentication (Future)",

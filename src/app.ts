@@ -2,6 +2,7 @@ import express from 'express';
 import { errorHandler } from './middlewares/error.middleware';
 import { requestLogger } from './middlewares/logger.middleware';
 import userRoutes from './modules/user/user.routes';
+import phoneVerificationRoutes from './modules/phone-verification/phone-verification.routes.js';
 
 const app = express();
 
@@ -17,6 +18,7 @@ app.get('/health', (_, res) => {
 
 // Routes
 app.use('/api/users', userRoutes);
+app.use('/api/phone-verification', phoneVerificationRoutes);
 
 // Global error handler (always last)
 app.use(errorHandler);

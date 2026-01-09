@@ -65,6 +65,8 @@ model PhoneVerification {
   
   // OTP Details
   otp         String?
+  channel     String    @default("whatsapp") // whatsapp or sms
+  verifySid   String?   @map("verify_sid") // Twilio Verify SID
   verified    Boolean   @default(false)
   
   // Expiration & Tracking
