@@ -19,8 +19,7 @@ app.get('/health', (_, res) => {
 
 // Routes matching Laravel structure
 app.use('/api/verification', phoneVerificationRoutes);
-app.use('/api/register', authRoutes); // Register route
-app.use('/api/phone-login', authRoutes); // Phone login routes
+app.use('/api', authRoutes);
 app.use('/api/users', userRoutes);
 
 // Global error handler (always last)

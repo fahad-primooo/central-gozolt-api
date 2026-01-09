@@ -38,7 +38,7 @@ export class AuthController {
       bio,
     } = req.body;
 
-    const user = await authService.register({
+    const { user, token } = await authService.register({
       first_name,
       last_name,
       username,
@@ -74,6 +74,7 @@ export class AuthController {
           created_at: user.createdAt,
           updated_at: user.updatedAt,
         },
+        auth_token: token,
       },
     });
   });
@@ -131,8 +132,64 @@ export class AuthController {
           created_at: user.createdAt,
           updated_at: user.updatedAt,
         },
-        token,
+        auth_token: token,
       },
+    });
+  });
+
+  /**
+   * Get authenticated user
+   * GET /api/me
+   */
+  me = asyncHandler(async (req: Request, res: Response) => {
+    const user = (req as any).user;
+
+    res.json({
+      status: true,
+      data: {
+        user: {
+          id: user.id,
+          first_name: user.firstName,
+          last_name: user.lastName,
+          display_name: user.displayName,
+          username: user.username,
+          email: user.email,
+          country_code: user.countryCode,
+          phone_number: user.phoneNumber,
+          email_verified: user.emailVerified,
+          phone_verified: user.phoneVerified,
+          phone_verified_at: user.phoneVerifiedAt,
+          avatar: user.avatar,
+          bio: user.bio,
+          status: user.status,
+          last_login_at: user.lastLoginAt,
+          created_at: user.createdAt,
+          updated_at: user.updatedAt,
+        },
+      },
+    });
+  });
+
+  /**
+   * Logout user (revoke token)
+   * POST /api/logout
+   */
+  logout = asyncHandler(async (req: Request, res: Response) => {
+    const authHeader = req.headers.authorization;
+
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.substring(7);
+
+      // Revoke the token
+      const { revokeToken } = await import('../../utils/token');
+      await revokeToken(token);
+
+      logger.info('User logged out successfully');
+    }
+
+    res.json({
+      status: true,
+      message: 'Logged out successfully',
     });
   });
 }

@@ -130,9 +130,15 @@ export class AuthService {
       return newUser;
     });
 
+    // Generate token for the registered user
+    const { plainTextToken } = await createToken(user.id, 'auth_token', 7);
+
     logger.info(`New user registered successfully: ${user.username} (ID: ${user.id})`);
 
-    return user;
+    return {
+      user,
+      token: plainTextToken,
+    };
   }
 
   /**

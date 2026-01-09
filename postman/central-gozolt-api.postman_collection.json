@@ -383,7 +383,7 @@
               "host": ["{{baseUrl}}"],
               "path": ["api", "register"]
             },
-            "description": "Register a new user account. Phone number must be verified via OTP before registration. Returns user data with plain text token."
+            "description": "Register a new user account. Phone number must be verified via OTP before registration. Returns user data with auth_token."
           },
           "response": []
         },
@@ -452,7 +452,7 @@
               "host": ["{{baseUrl}}"],
               "path": ["api", "phone-login", "verify-otp"]
             },
-            "description": "Login with OTP verification. Returns user data and JWT token. Updates last login time and deletes verification record."
+            "description": "Login with OTP verification. Returns user data and auth_token. Updates last login time and deletes verification record."
           },
           "response": [],
           "event": [
@@ -460,13 +460,68 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "// Save the token to environment variable",
+                  "// Save the auth_token to environment variable",
                   "if (pm.response.code === 200) {",
                   "    const response = pm.response.json();",
-                  "    if (response.data && response.data.token) {",
-                  "        pm.environment.set('accessToken', response.data.token);",
+                  "    if (response.data && response.data.auth_token) {",
+                  "        pm.environment.set('accessToken', response.data.auth_token);",
                   "        console.log('Token saved to environment');",
                   "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Current User (Me)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "me"]
+            },
+            "description": "Get the currently authenticated user's profile. Requires valid auth_token in Authorization header."
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "logout"]
+            },
+            "description": "Logout the current user by revoking their auth_token. Requires valid auth_token in Authorization header."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Clear the token from environment",
+                  "if (pm.response.code === 200) {",
+                  "    pm.environment.unset('accessToken');",
+                  "    console.log('Token cleared from environment');",
                   "}"
                 ],
                 "type": "text/javascript"
