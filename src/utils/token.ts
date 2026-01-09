@@ -1,54 +1,63 @@
+import jwt, { SignOptions } from 'jsonwebtoken';
+import type { StringValue } from 'ms';
 import crypto from 'crypto';
 import { prisma } from '../lib/prisma';
 import { ApiError } from './ApiError';
+import { env } from '../config/env';
 
-/**
- * Generate a random plain text token (similar to Laravel Sanctum)
- * @param length Token length (default: 40 characters)
- * @returns Plain text token
- */
-export function generatePlainTextToken(length = 40): string {
-  return crypto.randomBytes(length).toString('hex').slice(0, length);
+interface JWTPayload {
+  userId: number;
+  jti: string; // JWT ID for tracking and revocation
+  tokenName: string;
 }
 
 /**
- * Hash a token using SHA-256
- * @param token Plain text token
- * @returns Hashed token
+ * Generate a unique token identifier (JTI - JWT ID)
+ * @returns Unique identifier
  */
-export function hashToken(token: string): string {
-  return crypto.createHash('sha256').update(token).digest('hex');
+function generateJti(): string {
+  return crypto.randomBytes(16).toString('hex');
 }
 
 /**
- * Create a new token for a user
+ * Create a new JWT token for a user
  * @param userId User ID
  * @param tokenName Token name (default: 'auth_token')
- * @param expiresInDays Expiration in days (default: 7 days, null for no expiration)
- * @returns Object containing plain text token and token record
+ * @param expiresInDays Expiration in days (uses env default if null)
+ * @returns Object containing JWT token and token record
  */
 export async function createToken(
   userId: number,
   tokenName = 'auth_token',
-  expiresInDays: number | null = 7
+  expiresInDays: number | null = null
 ) {
-  // Generate plain text token
-  const plainTextToken = generatePlainTextToken();
+  const jti = generateJti();
 
-  // Hash the token for storage
-  const hashedToken = hashToken(plainTextToken);
+  const expiresIn: StringValue | number = (
+    expiresInDays ? `${expiresInDays}d` : env.jwtAccessTokenExpiration
+  ) as StringValue;
 
-  // Calculate expiration date
-  const expiresAt = expiresInDays
-    ? new Date(Date.now() + expiresInDays * 24 * 60 * 60 * 1000)
-    : null;
+  const envExpirationMatch = env.jwtAccessTokenExpiration.match(/^(\d+)d$/);
+  const envExpirationDays = envExpirationMatch ? parseInt(envExpirationMatch[1]) : 90;
+  const expirationDays = expiresInDays || envExpirationDays;
+  const expiresAt = new Date(Date.now() + expirationDays * 24 * 60 * 60 * 1000);
 
-  // Create token record
+  // Create JWT payload
+  const payload: JWTPayload = {
+    userId,
+    jti,
+    tokenName,
+  };
+
+  // Sign the JWT token
+  const signOptions: SignOptions = { expiresIn };
+  const plainTextToken = jwt.sign(payload, env.jwtSecret, signOptions);
+
   const tokenRecord = await prisma.token.create({
     data: {
       userId,
       name: tokenName,
-      token: hashedToken,
+      token: jti, // Store JTI for revocation tracking
       expiresAt,
     },
   });
@@ -60,74 +69,91 @@ export async function createToken(
 }
 
 /**
- * Verify a token and return the associated user
- * @param token Plain text token from Authorization header
+ * Verify a JWT token and return the associated user
+ * @param token JWT token from Authorization header
  * @returns User object if token is valid
  * @throws ApiError if token is invalid or expired
  */
 export async function verifyToken(token: string) {
-  // Hash the provided token
-  const hashedToken = hashToken(token);
+  try {
+    const decoded = jwt.verify(token, env.jwtSecret) as JWTPayload;
 
-  // Find the token in database
-  const tokenRecord = await prisma.token.findUnique({
-    where: { token: hashedToken },
-    include: {
-      user: {
-        select: {
-          id: true,
-          firstName: true,
-          lastName: true,
-          displayName: true,
-          username: true,
-          email: true,
-          countryCode: true,
-          phoneNumber: true,
-          emailVerified: true,
-          phoneVerified: true,
-          avatar: true,
-          bio: true,
-          status: true,
-          lastLoginAt: true,
-          createdAt: true,
-          updatedAt: true,
+    const tokenRecord = await prisma.token.findUnique({
+      where: { token: decoded.jti },
+      include: {
+        user: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            displayName: true,
+            username: true,
+            email: true,
+            countryCode: true,
+            phoneNumber: true,
+            emailVerified: true,
+            phoneVerified: true,
+            avatar: true,
+            bio: true,
+            status: true,
+            lastLoginAt: true,
+            createdAt: true,
+            updatedAt: true,
+          },
         },
       },
-    },
-  });
-
-  if (!tokenRecord) {
-    throw new ApiError(401, 'Invalid token');
-  }
-
-  // Check if token has expired
-  if (tokenRecord.expiresAt && new Date() > tokenRecord.expiresAt) {
-    // Delete expired token
-    await prisma.token.delete({
-      where: { id: tokenRecord.id },
     });
-    throw new ApiError(401, 'Token has expired');
+
+    if (!tokenRecord) {
+      throw new ApiError(401, 'Token has been revoked');
+    }
+
+    // Update last used timestamp (async, don't wait for it)
+    prisma.token
+      .update({
+        where: { id: tokenRecord.id },
+        data: { lastUsedAt: new Date() },
+      })
+      .catch(() => {});
+
+    return tokenRecord.user;
+  } catch (error) {
+    if (error instanceof jwt.JsonWebTokenError) {
+      throw new ApiError(401, 'Invalid token');
+    }
+    if (error instanceof jwt.TokenExpiredError) {
+      throw new ApiError(401, 'Token has expired');
+    }
+    // Re-throw ApiError instances
+    if (error instanceof ApiError) {
+      throw error;
+    }
+    throw new ApiError(401, 'Token verification failed');
   }
-
-  // Update last used timestamp
-  await prisma.token.update({
-    where: { id: tokenRecord.id },
-    data: { lastUsedAt: new Date() },
-  });
-
-  return tokenRecord.user;
 }
 
 /**
  * Revoke (delete) a specific token
- * @param token Plain text token or hashed token
+ * @param token JWT token to revoke
  */
 export async function revokeToken(token: string) {
-  const hashedToken = hashToken(token);
+  try {
+    // Decode the token to get the JTI (don't verify, just decode)
+    const decoded = jwt.decode(token) as JWTPayload | null;
 
-  await prisma.token.delete({
-    where: { token: hashedToken },
-  });
+    if (!decoded || !decoded.jti) {
+      throw new ApiError(400, 'Invalid token format');
+    }
+
+    // Delete the token record using JTI
+    await prisma.token.delete({
+      where: { token: decoded.jti },
+    });
+  } catch (error) {
+    if (error instanceof ApiError) {
+      throw error;
+    }
+  }
 }
 
 /**

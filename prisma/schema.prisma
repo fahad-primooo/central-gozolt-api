@@ -64,7 +64,7 @@ model Token {
   
   // Token Information
   name        String    @default("auth_token")
-  token       String    @unique @db.VarChar(64) // Hashed token
+  token       String    @unique @db.VarChar(255) // JWT ID (JTI) for tracking
   
   // User Relation
   userId      Int       @map("user_id")
