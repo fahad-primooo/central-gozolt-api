@@ -49,11 +49,37 @@ model User {
   status      UserStatus @default(ACTIVE)
   lastLoginAt DateTime? @map("last_login_at")
   
+  // Relations
+  tokens      Token[]
+  
   @@unique([countryCode, phoneNumber])
   @@index([email])
   @@index([username])
   @@index([countryCode, phoneNumber])
   @@map("users")
+}
+
+model Token {
+  id          Int       @id @default(autoincrement())
+  
+  // Token Information
+  name        String    @default("auth_token")
+  token       String    @unique @db.VarChar(64) // Hashed token
+  
+  // User Relation
+  userId      Int       @map("user_id")
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Token Metadata
+  lastUsedAt  DateTime? @map("last_used_at")
+  expiresAt   DateTime? @map("expires_at")
+  
+  // Timestamps
+  createdAt   DateTime  @default(now()) @map("created_at")
+  
+  @@index([userId])
+  @@index([token])
+  @@map("tokens")
 }
 
 model PhoneVerification {

@@ -13,7 +13,7 @@ import {
 const router = Router();
 
 /**
- * @route   POST /api/phone-verification/initiate
+ * @route   POST /api/verification/initiate
  * @desc    Initiate phone verification (send OTP via WhatsApp or SMS)
  * @access  Public
  */
@@ -25,7 +25,7 @@ router.post(
 );
 
 /**
- * @route   POST /api/phone-verification/resend
+ * @route   POST /api/verification/resend
  * @desc    Resend OTP (switch between WhatsApp and SMS)
  * @access  Public
  */
@@ -37,7 +37,7 @@ router.post(
 );
 
 /**
- * @route   POST /api/phone-verification/verify
+ * @route   POST /api/verification/verify
  * @desc    Verify OTP code
  * @access  Public
  */

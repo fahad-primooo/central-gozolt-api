@@ -3,6 +3,7 @@ import { errorHandler } from './middlewares/error.middleware';
 import { requestLogger } from './middlewares/logger.middleware';
 import userRoutes from './modules/user/user.routes';
 import phoneVerificationRoutes from './modules/phone-verification/phone-verification.routes.js';
+import authRoutes from './modules/auth/auth.routes';
 
 const app = express();
 
@@ -16,9 +17,11 @@ app.get('/health', (_, res) => {
   res.json({ status: 'ok' });
 });
 
-// Routes
+// Routes matching Laravel structure
+app.use('/api/verification', phoneVerificationRoutes);
+app.use('/api/register', authRoutes); // Register route
+app.use('/api/phone-login', authRoutes); // Phone login routes
 app.use('/api/users', userRoutes);
-app.use('/api/phone-verification', phoneVerificationRoutes);
 
 // Global error handler (always last)
 app.use(errorHandler);

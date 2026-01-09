@@ -43,7 +43,11 @@ export class PhoneVerificationController {
    * POST /api/phone-verification/initiate
    */
   initiateVerification = asyncHandler(async (req: Request, res: Response) => {
-    const { contactNumber, countryCode, verificationMethod = 'whatsapp' } = req.body;
+    const {
+      contact_number: contactNumber,
+      country_code: countryCode,
+      verification_method: verificationMethod = 'whatsapp',
+    } = req.body;
 
     // Check if user already exists with this phone number
     const userExists = await phoneVerificationService.checkUserExists(countryCode, contactNumber);
@@ -91,9 +95,9 @@ export class PhoneVerificationController {
       status: true,
       message: `OTP is being sent via ${channel}`,
       data: {
-        normalizedPhone,
+        normalized_phone: normalizedPhone,
         channel,
-        expiresInMinutes: 10,
+        expires_in_minutes: 10,
       },
     });
   });
@@ -103,7 +107,11 @@ export class PhoneVerificationController {
    * POST /api/phone-verification/resend
    */
   resendVerification = asyncHandler(async (req: Request, res: Response) => {
-    const { contactNumber, countryCode, verificationMethod } = req.body;
+    const {
+      contact_number: contactNumber,
+      country_code: countryCode,
+      verification_method: verificationMethod,
+    } = req.body;
     const normalizedPhone = (countryCode + contactNumber).replace(/\s+/g, '');
 
     const verification = await phoneVerificationService.getPendingVerification(
@@ -149,8 +157,8 @@ export class PhoneVerificationController {
       message: `OTP resent via ${channel}`,
       data: {
         channel,
-        contactNumber,
-        countryCode,
+        contact_number: contactNumber,
+        country_code: countryCode,
       },
     });
   });
@@ -160,7 +168,7 @@ export class PhoneVerificationController {
    * POST /api/phone-verification/verify
    */
   verifyOtp = asyncHandler(async (req: Request, res: Response) => {
-    const { contactNumber, countryCode, otp } = req.body;
+    const { contact_number: contactNumber, country_code: countryCode, otp } = req.body;
     const normalizedPhone = (countryCode + contactNumber).replace(/\s+/g, '');
 
     const verification = await phoneVerificationService.getPendingVerification(
@@ -199,9 +207,9 @@ export class PhoneVerificationController {
       status: true,
       message: 'Phone number verified successfully',
       data: {
-        contactNumber,
-        countryCode,
-        verifiedAt: new Date(),
+        contact_number: contactNumber,
+        country_code: countryCode,
+        verified_at: new Date(),
       },
     });
   });

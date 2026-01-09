@@ -255,12 +255,12 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"contactNumber\": \"3001234567\",\n  \"countryCode\": \"+92\",\n  \"verificationMethod\": \"whatsapp\"\n}"
+              "raw": "{\n  \"contact_number\": \"3001234567\",\n  \"country_code\": \"+92\",\n  \"verification_method\": \"whatsapp\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/api/phone-verification/initiate",
+              "raw": "{{baseUrl}}/api/verification/initiate",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "phone-verification", "initiate"]
+              "path": ["api", "verification", "initiate"]
             },
             "description": "Initiate phone verification by sending OTP via WhatsApp or SMS. Checks if user already exists with this phone number."
           },
@@ -278,12 +278,12 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"contactNumber\": \"3001234567\",\n  \"countryCode\": \"+92\",\n  \"verificationMethod\": \"sms\"\n}"
+              "raw": "{\n  \"contact_number\": \"3001234567\",\n  \"country_code\": \"+92\",\n  \"verification_method\": \"sms\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/api/phone-verification/initiate",
+              "raw": "{{baseUrl}}/api/verification/initiate",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "phone-verification", "initiate"]
+              "path": ["api", "verification", "initiate"]
             },
             "description": "Initiate phone verification by sending OTP via SMS instead of WhatsApp."
           },
@@ -301,12 +301,12 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"contactNumber\": \"3001234567\",\n  \"countryCode\": \"+92\",\n  \"verificationMethod\": \"sms\"\n}"
+              "raw": "{\n  \"contact_number\": \"3001234567\",\n  \"country_code\": \"+92\",\n  \"verification_method\": \"sms\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/api/phone-verification/resend",
+              "raw": "{{baseUrl}}/api/verification/resend",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "phone-verification", "resend"]
+              "path": ["api", "verification", "resend"]
             },
             "description": "Resend OTP code. Can switch from WhatsApp to SMS or vice versa. Limited to 3 resends per 10 minutes."
           },
@@ -324,12 +324,12 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"contactNumber\": \"3001234567\",\n  \"countryCode\": \"+92\",\n  \"verificationMethod\": \"whatsapp\"\n}"
+              "raw": "{\n  \"contact_number\": \"3001234567\",\n  \"country_code\": \"+92\",\n  \"verification_method\": \"whatsapp\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/api/phone-verification/resend",
+              "raw": "{{baseUrl}}/api/verification/resend",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "phone-verification", "resend"]
+              "path": ["api", "verification", "resend"]
             },
             "description": "Resend OTP code via WhatsApp. Can switch from SMS to WhatsApp."
           },
@@ -347,12 +347,12 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"contactNumber\": \"3001234567\",\n  \"countryCode\": \"+92\",\n  \"otp\": \"123456\"\n}"
+              "raw": "{\n  \"contact_number\": \"3001234567\",\n  \"country_code\": \"+92\",\n  \"otp\": \"123456\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/api/phone-verification/verify",
+              "raw": "{{baseUrl}}/api/verification/verify",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "phone-verification", "verify"]
+              "path": ["api", "verification", "verify"]
             },
             "description": "Verify the OTP code sent via WhatsApp or SMS. OTP is valid for 10 minutes."
           },
@@ -360,6 +360,122 @@
         }
       ],
       "description": "Phone verification endpoints using Twilio Verify API. Supports both WhatsApp and SMS channels with rate limiting."
+    },
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"first_name\": \"John\",\n  \"last_name\": \"Doe\",\n  \"username\": \"johndoe123\",\n  \"email\": \"john.doe@example.com\",\n  \"country_code\": \"+92\",\n  \"phone_number\": \"3001234567\",\n  \"password\": \"SecurePass123\",\n  \"avatar\": \"https://example.com/avatar.jpg\",\n  \"bio\": \"Software developer and tech enthusiast\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "register"]
+            },
+            "description": "Register a new user account. Phone number must be verified via OTP before registration. Returns user data with plain text token."
+          },
+          "response": []
+        },
+        {
+          "name": "Request OTP (WhatsApp)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"country_code\": \"+92\",\n  \"phone_number\": \"3001234567\",\n  \"channel\": \"whatsapp\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/phone-login/request-otp",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "phone-login", "request-otp"]
+            },
+            "description": "Initiate login by sending OTP to registered phone number via WhatsApp. User must be registered first."
+          },
+          "response": []
+        },
+        {
+          "name": "Request OTP (SMS)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"country_code\": \"+92\",\n  \"phone_number\": \"3001234567\",\n  \"channel\": \"sms\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/phone-login/request-otp",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "phone-login", "request-otp"]
+            },
+            "description": "Initiate login by sending OTP to registered phone number via SMS."
+          },
+          "response": []
+        },
+        {
+          "name": "Verify OTP & Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"country_code\": \"+92\",\n  \"phone_number\": \"3001234567\",\n  \"otp\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/phone-login/verify-otp",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "phone-login", "verify-otp"]
+            },
+            "description": "Login with OTP verification. Returns user data and JWT token. Updates last login time and deletes verification record."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Save the token to environment variable",
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.token) {",
+                  "        pm.environment.set('accessToken', response.data.token);",
+                  "        console.log('Token saved to environment');",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ],
+      "description": "Authentication endpoints - registration, login with OTP"
     },
     {
       "name": "Authentication (Future)",
