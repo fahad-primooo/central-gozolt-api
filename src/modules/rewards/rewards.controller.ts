@@ -10,17 +10,9 @@ export class RewardController {
    * POST /api/rewards/process-action
    */
   processAction = asyncHandler(async (req: Request, res: Response) => {
-    const {
-      actionType,
-      accountableType,
-      accountableId,
-      serviceType,
-      sourceType,
-      sourceId,
-      metadata,
-    } = req.body;
+    const { actionType, userId, serviceType, sourceType, sourceId, metadata } = req.body;
 
-    const results = await rewardService.processAction(actionType, accountableType, accountableId, {
+    const results = await rewardService.processAction(actionType, userId, {
       serviceType,
       sourceType,
       sourceId,
@@ -42,18 +34,10 @@ export class RewardController {
    * POST /api/rewards/redeem
    */
   redeem = asyncHandler(async (req: Request, res: Response) => {
-    const {
-      accountableType,
-      accountableId,
-      serviceType,
-      serviceName,
-      sourceType,
-      sourceId,
-      rideAmount,
-      coinsToRedeem,
-    } = req.body;
+    const { userId, serviceType, serviceName, sourceType, sourceId, rideAmount, coinsToRedeem } =
+      req.body;
 
-    const result = await rewardService.redeem(accountableType, accountableId, {
+    const result = await rewardService.redeem(userId, {
       serviceType,
       serviceName,
       sourceType,
@@ -76,12 +60,12 @@ export class RewardController {
 
   /**
    * Get reward account balance
-   * GET /api/rewards/balance/:accountableType/:accountableId
+   * GET /api/rewards/balance/:userId
    */
   getBalance = asyncHandler(async (req: Request, res: Response) => {
-    const { accountableType, accountableId } = req.params;
+    const { userId } = req.params;
 
-    const balance = await rewardService.getBalance(accountableType, parseInt(accountableId));
+    const balance = await rewardService.getBalance(parseInt(userId));
 
     res.json({
       status: true,
@@ -92,13 +76,13 @@ export class RewardController {
 
   /**
    * Get transaction history
-   * GET /api/rewards/transactions/:accountableType/:accountableId
+   * GET /api/rewards/transactions/:userId
    */
   getTransactions = asyncHandler(async (req: Request, res: Response) => {
-    const { accountableType, accountableId } = req.params;
+    const { userId } = req.params;
     const { page = '1', limit = '20' } = req.query;
 
-    const result = await rewardService.getTransactions(accountableType, parseInt(accountableId), {
+    const result = await rewardService.getTransactions(parseInt(userId), {
       page: parseInt(page as string),
       limit: parseInt(limit as string),
     });

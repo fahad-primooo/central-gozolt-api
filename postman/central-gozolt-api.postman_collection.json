@@ -641,7 +641,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"actionType\": \"ride_completed\",\n  \"accountableType\": \"User\",\n  \"accountableId\": 1,\n  \"serviceType\": \"taxi\",\n  \"sourceType\": \"RideRequest\",\n  \"sourceId\": 123,\n  \"metadata\": {\n    \"actualAmount\": 1000,\n    \"distance\": 10.5,\n    \"duration\": 25\n  }\n}"
+              "raw": "{\n  \"actionType\": \"ride_completed\",\n  \"userId\": 1,\n  \"serviceType\": \"taxi\",\n  \"sourceType\": \"RideRequest\",\n  \"sourceId\": 123,\n  \"metadata\": {\n    \"actualAmount\": 1000,\n    \"distance\": 10.5,\n    \"duration\": 25\n  }\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/rewards/process-action",
@@ -664,7 +664,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"actionType\": \"registration\",\n  \"accountableType\": \"User\",\n  \"accountableId\": 1,\n  \"metadata\": {\n    \"source\": \"mobile_app\",\n    \"referredBy\": null\n  }\n}"
+              "raw": "{\n  \"actionType\": \"registration\",\n  \"userId\": 1,\n  \"metadata\": {\n    \"source\": \"mobile_app\",\n    \"referredBy\": null\n  }\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/rewards/process-action",
@@ -687,7 +687,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"actionType\": \"referral\",\n  \"accountableType\": \"User\",\n  \"accountableId\": 1,\n  \"metadata\": {\n    \"referredUserId\": 10,\n    \"referredUserName\": \"Jane Doe\"\n  }\n}"
+              "raw": "{\n  \"actionType\": \"referral\",\n  \"userId\": 1,\n  \"metadata\": {\n    \"referredUserId\": 10,\n    \"referredUserName\": \"Jane Doe\"\n  }\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/rewards/process-action",
@@ -710,7 +710,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"accountableType\": \"User\",\n  \"accountableId\": 1,\n  \"serviceType\": \"taxi\",\n  \"serviceName\": \"Gozolt Taxi\",\n  \"sourceType\": \"RideRequest\",\n  \"sourceId\": 456,\n  \"rideAmount\": 1000,\n  \"coinsToRedeem\": 50\n}"
+              "raw": "{\n  \"userId\": 1,\n  \"serviceType\": \"taxi\",\n  \"serviceName\": \"Gozolt Taxi\",\n  \"sourceType\": \"RideRequest\",\n  \"sourceId\": 456,\n  \"rideAmount\": 1000,\n  \"coinsToRedeem\": 50\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/rewards/redeem",
@@ -727,23 +727,18 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/rewards/balance/:accountableType/:accountableId",
+              "raw": "{{baseUrl}}/api/rewards/balance/:userId",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "rewards", "balance", ":accountableType", ":accountableId"],
+              "path": ["api", "rewards", "balance", ":userId"],
               "variable": [
                 {
-                  "key": "accountableType",
-                  "value": "User",
-                  "description": "Account type (User, Driver, etc.)"
-                },
-                {
-                  "key": "accountableId",
+                  "key": "userId",
                   "value": "1",
-                  "description": "Account ID"
+                  "description": "User ID"
                 }
               ]
             },
-            "description": "Get reward account balance for a user or driver. Returns points balance, level, and equivalent cash value."
+            "description": "Get reward account balance for a user. Returns points balance, level, and equivalent cash value."
           },
           "response": []
         },
@@ -753,9 +748,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/rewards/transactions/:accountableType/:accountableId?page=1&limit=20",
+              "raw": "{{baseUrl}}/api/rewards/transactions/:userId?page=1&limit=20",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "rewards", "transactions", ":accountableType", ":accountableId"],
+              "path": ["api", "rewards", "transactions", ":userId"],
               "query": [
                 {
                   "key": "page",
@@ -770,14 +765,9 @@
               ],
               "variable": [
                 {
-                  "key": "accountableType",
-                  "value": "User",
-                  "description": "Account type (User, Driver, etc.)"
-                },
-                {
-                  "key": "accountableId",
+                  "key": "userId",
                   "value": "1",
-                  "description": "Account ID"
+                  "description": "User ID"
                 }
               ]
             },

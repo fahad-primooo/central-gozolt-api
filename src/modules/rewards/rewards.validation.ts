@@ -3,8 +3,7 @@ import { z } from 'zod';
 export const processActionSchema = z.object({
   body: z.object({
     actionType: z.string().min(1, 'Action type is required'),
-    accountableType: z.string().min(1, 'Accountable type is required (e.g., User, Driver)'),
-    accountableId: z.number().int().positive('Accountable ID must be a positive integer'),
+    userId: z.number().int().positive('User ID must be a positive integer'),
     serviceType: z.string().optional(),
     sourceType: z.string().optional(),
     sourceId: z.number().int().positive().optional(),
@@ -14,8 +13,7 @@ export const processActionSchema = z.object({
 
 export const redeemRewardsSchema = z.object({
   body: z.object({
-    accountableType: z.string().min(1, 'Accountable type is required (e.g., User, Driver)'),
-    accountableId: z.number().int().positive('Accountable ID must be a positive integer'),
+    userId: z.number().int().positive('User ID must be a positive integer'),
     serviceType: z.string().min(1, 'Service type is required (e.g., taxi, delivery)'),
     serviceName: z.string().optional(),
     sourceType: z.string().optional(),
@@ -27,15 +25,13 @@ export const redeemRewardsSchema = z.object({
 
 export const getBalanceSchema = z.object({
   params: z.object({
-    accountableType: z.string().min(1, 'Accountable type is required'),
-    accountableId: z.string().regex(/^\d+$/, 'Accountable ID must be a number'),
+    userId: z.string().regex(/^\d+$/, 'User ID must be a number'),
   }),
 });
 
 export const getTransactionsSchema = z.object({
   params: z.object({
-    accountableType: z.string().min(1, 'Accountable type is required'),
-    accountableId: z.string().regex(/^\d+$/, 'Accountable ID must be a number'),
+    userId: z.string().regex(/^\d+$/, 'User ID must be a number'),
   }),
   query: z.object({
     page: z.string().regex(/^\d+$/).optional(),

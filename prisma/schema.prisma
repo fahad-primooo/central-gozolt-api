@@ -50,6 +50,7 @@ model User {
   lastLoginAt DateTime? @map("last_login_at")
   
   // Relations
+  rewardAccount RewardAccount?
   tokens      Token[]
   
   @@unique([countryCode, phoneNumber])
@@ -113,9 +114,9 @@ model PhoneVerification {
 model RewardAccount {
   id              Int       @id @default(autoincrement())
   
-  // Polymorphic relation (accountable)
-  accountableType String    @map("accountable_type") // e.g., "User", "Driver"
-  accountableId   Int       @map("accountable_id")
+  // Direct User relation (instead of polymorphic)
+  userId          Int       @unique @map("user_id")
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   
   // Balance & Level
   pointsBalance   Int       @default(0) @map("points_balance")
@@ -128,8 +129,7 @@ model RewardAccount {
   // Relations
   transactions    RewardTransaction[]
   
-  @@unique([accountableType, accountableId])
-  @@index([accountableType, accountableId])
+  @@index([userId])
   @@map("reward_accounts")
 }
 

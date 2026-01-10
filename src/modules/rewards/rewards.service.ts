@@ -9,8 +9,7 @@ export class RewardService {
    */
   async processAction(
     actionType: string,
-    accountableType: string,
-    accountableId: number,
+    userId: number,
     options: {
       serviceType?: string;
       sourceType?: string;
@@ -36,7 +35,7 @@ export class RewardService {
     for (const rule of rules) {
       // Evaluate conditions
       if (this.evaluateConditions(rule, { serviceType, metadata })) {
-        const result = await this.applyReward(rule, accountableType, accountableId, {
+        const result = await this.applyReward(rule, userId, {
           sourceType,
           sourceId,
           metadata,
@@ -73,8 +72,7 @@ export class RewardService {
       actionType: string;
       pointsAwarded: number;
     },
-    accountableType: string,
-    accountableId: number,
+    userId: number,
     options: {
       sourceType?: string;
       sourceId?: number;
@@ -86,14 +84,10 @@ export class RewardService {
     // Get or create reward account
     const account = await prisma.rewardAccount.upsert({
       where: {
-        accountableType_accountableId: {
-          accountableType,
-          accountableId,
-        },
+        userId,
       },
       create: {
-        accountableType,
-        accountableId,
+        userId,
         pointsBalance: 0,
         level: 1,
       },
@@ -137,7 +131,7 @@ export class RewardService {
     });
 
     logger.info(
-      `Reward applied: ${points} coins for ${accountableType}:${accountableId} (action: ${rule.actionType})`
+      `Reward applied: ${points} coins for userId:${userId} (action: ${rule.actionType})`
     );
 
     return result;
@@ -147,8 +141,7 @@ export class RewardService {
    * Redeem rewards for a service/ride
    */
   async redeem(
-    accountableType: string,
-    accountableId: number,
+    userId: number,
     options: {
       serviceType: string;
       serviceName?: string;
@@ -163,10 +156,7 @@ export class RewardService {
     // Get reward account
     const account = await prisma.rewardAccount.findUnique({
       where: {
-        accountableType_accountableId: {
-          accountableType,
-          accountableId,
-        },
+        userId,
       },
     });
 
@@ -222,7 +212,7 @@ export class RewardService {
     });
 
     logger.info(
-      `Rewards redeemed: ${coinsToRedeem} coins = ${discountAmount} discount for ${accountableType}:${accountableId}`
+      `Rewards redeemed: ${coinsToRedeem} coins = ${discountAmount} discount for userId:${userId}`
     );
 
     return result;
@@ -231,13 +221,10 @@ export class RewardService {
   /**
    * Get reward account balance
    */
-  async getBalance(accountableType: string, accountableId: number) {
+  async getBalance(userId: number) {
     const account = await prisma.rewardAccount.findUnique({
       where: {
-        accountableType_accountableId: {
-          accountableType,
-          accountableId,
-        },
+        userId,
       },
     });
 
@@ -259,20 +246,13 @@ export class RewardService {
   /**
    * Get transaction history
    */
-  async getTransactions(
-    accountableType: string,
-    accountableId: number,
-    options: { page?: number; limit?: number } = {}
-  ) {
+  async getTransactions(userId: number, options: { page?: number; limit?: number } = {}) {
     const { page = 1, limit = 20 } = options;
     const skip = (page - 1) * limit;
 
     const account = await prisma.rewardAccount.findUnique({
       where: {
-        accountableType_accountableId: {
-          accountableType,
-          accountableId,
-        },
+        userId,
       },
     });
 

@@ -28,23 +28,19 @@ router.post('/process-action', validate(processActionSchema), rewardController.p
 router.post('/redeem', validate(redeemRewardsSchema), rewardController.redeem);
 
 /**
- * @route   GET /api/rewards/balance/:accountableType/:accountableId
+ * @route   GET /api/rewards/balance/:userId
  * @desc    Get reward account balance
  * @access  Public
  */
-router.get(
-  '/balance/:accountableType/:accountableId',
-  validate(getBalanceSchema),
-  rewardController.getBalance
-);
+router.get('/balance/:userId', validate(getBalanceSchema), rewardController.getBalance);
 
 /**
- * @route   GET /api/rewards/transactions/:accountableType/:accountableId
+ * @route   GET /api/rewards/transactions/:userId
  * @desc    Get transaction history
  * @access  Public
  */
 router.get(
-  '/transactions/:accountableType/:accountableId',
+  '/transactions/:userId',
   validate(getTransactionsSchema),
   rewardController.getTransactions
 );
