@@ -110,6 +110,79 @@ model PhoneVerification {
   @@map("phone_verifications")
 }
 
+model RewardAccount {
+  id              Int       @id @default(autoincrement())
+  
+  // Polymorphic relation (accountable)
+  accountableType String    @map("accountable_type") // e.g., "User", "Driver"
+  accountableId   Int       @map("accountable_id")
+  
+  // Balance & Level
+  pointsBalance   Int       @default(0) @map("points_balance")
+  level           Int       @default(1)
+  
+  // Timestamps
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  
+  // Relations
+  transactions    RewardTransaction[]
+  
+  @@unique([accountableType, accountableId])
+  @@index([accountableType, accountableId])
+  @@map("reward_accounts")
+}
+
+model RewardRule {
+  id              Int       @id @default(autoincrement())
+  
+  // Rule Details
+  actionType      String    @map("action_type") // e.g., "ride_completed", "referral", "registration"
+  serviceType     String?   @map("service_type") // e.g., "taxi", "delivery", null for all
+  pointsAwarded   Int       @map("points_awarded")
+  description     String?   @db.Text
+  
+  // Status
+  isActive        Boolean   @default(true) @map("is_active")
+  
+  // Timestamps
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  
+  @@index([actionType, serviceType])
+  @@map("reward_rules")
+}
+
+model RewardTransaction {
+  id              Int       @id @default(autoincrement())
+  
+  // Account relation
+  rewardAccountId Int       @map("reward_account_id")
+  rewardAccount   RewardAccount @relation(fields: [rewardAccountId], references: [id], onDelete: Cascade)
+  
+  // Transaction Details
+  actionType      String    @map("action_type") // e.g., "ride_completed", "redemption"
+  points          Int       // Positive for earning, negative for redemption
+  
+  // Source (polymorphic relation)
+  sourceType      String?   @map("source_type") // e.g., "RideRequest", "Order"
+  sourceId        Int?      @map("source_id")
+  
+  // Redemption
+  isRedeemed      Boolean   @default(false) @map("is_redeemed")
+  
+  // Metadata (JSON)
+  metadata        Json?
+  
+  // Timestamps
+  createdAt       DateTime  @default(now()) @map("created_at")
+  
+  @@index([rewardAccountId])
+  @@index([sourceType, sourceId])
+  @@index([actionType])
+  @@map("reward_transactions")
+}
+
 enum UserStatus {
   ACTIVE
   INACTIVE

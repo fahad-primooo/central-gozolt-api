@@ -2,7 +2,7 @@
   "info": {
     "name": "Central Gozolt API",
     "_postman_id": "central-gozolt-api-collection",
-    "description": "API collection for Central Gozolt API - User Management, Phone Verification, and Authentication",
+    "description": "API collection for Central Gozolt API - User Management, Phone Verification, Rewards, and Authentication",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -255,12 +255,12 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"contact_number\": \"3001234567\",\n  \"country_code\": \"+92\",\n  \"verification_method\": \"whatsapp\"\n}"
+              "raw": "{\n  \"contactNumber\": \"3001234567\",\n  \"countryCode\": \"+92\",\n  \"verificationMethod\": \"whatsapp\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/api/verification/initiate",
+              "raw": "{{baseUrl}}/api/phone-verification/initiate",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "verification", "initiate"]
+              "path": ["api", "phone-verification", "initiate"]
             },
             "description": "Initiate phone verification by sending OTP via WhatsApp or SMS. Checks if user already exists with this phone number."
           },
@@ -278,12 +278,12 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"contact_number\": \"3001234567\",\n  \"country_code\": \"+92\",\n  \"verification_method\": \"sms\"\n}"
+              "raw": "{\n  \"contactNumber\": \"3001234567\",\n  \"countryCode\": \"+92\",\n  \"verificationMethod\": \"sms\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/api/verification/initiate",
+              "raw": "{{baseUrl}}/api/phone-verification/initiate",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "verification", "initiate"]
+              "path": ["api", "phone-verification", "initiate"]
             },
             "description": "Initiate phone verification by sending OTP via SMS instead of WhatsApp."
           },
@@ -301,12 +301,12 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"contact_number\": \"3001234567\",\n  \"country_code\": \"+92\",\n  \"verification_method\": \"sms\"\n}"
+              "raw": "{\n  \"contactNumber\": \"3001234567\",\n  \"countryCode\": \"+92\",\n  \"verificationMethod\": \"sms\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/api/verification/resend",
+              "raw": "{{baseUrl}}/api/phone-verification/resend",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "verification", "resend"]
+              "path": ["api", "phone-verification", "resend"]
             },
             "description": "Resend OTP code. Can switch from WhatsApp to SMS or vice versa. Limited to 3 resends per 10 minutes."
           },
@@ -324,12 +324,12 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"contact_number\": \"3001234567\",\n  \"country_code\": \"+92\",\n  \"verification_method\": \"whatsapp\"\n}"
+              "raw": "{\n  \"contactNumber\": \"3001234567\",\n  \"countryCode\": \"+92\",\n  \"verificationMethod\": \"whatsapp\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/api/verification/resend",
+              "raw": "{{baseUrl}}/api/phone-verification/resend",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "verification", "resend"]
+              "path": ["api", "phone-verification", "resend"]
             },
             "description": "Resend OTP code via WhatsApp. Can switch from SMS to WhatsApp."
           },
@@ -347,12 +347,12 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"contact_number\": \"3001234567\",\n  \"country_code\": \"+92\",\n  \"otp\": \"123456\"\n}"
+              "raw": "{\n  \"contactNumber\": \"3001234567\",\n  \"countryCode\": \"+92\",\n  \"otp\": \"123456\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/api/verification/verify",
+              "raw": "{{baseUrl}}/api/phone-verification/verify",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "verification", "verify"]
+              "path": ["api", "phone-verification", "verify"]
             },
             "description": "Verify the OTP code sent via WhatsApp or SMS. OTP is valid for 10 minutes."
           },
@@ -625,6 +625,353 @@
         }
       ],
       "description": "Authentication endpoints (to be implemented by another developer)"
+    },
+    {
+      "name": "Rewards",
+      "item": [
+        {
+          "name": "Process Reward Action",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"actionType\": \"ride_completed\",\n  \"accountableType\": \"User\",\n  \"accountableId\": 1,\n  \"serviceType\": \"taxi\",\n  \"sourceType\": \"RideRequest\",\n  \"sourceId\": 123,\n  \"metadata\": {\n    \"actualAmount\": 1000,\n    \"distance\": 10.5,\n    \"duration\": 25\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/rewards/process-action",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "rewards", "process-action"]
+            },
+            "description": "Process a reward action (called by Laravel or other services). Evaluates applicable rules and applies rewards. Commonly used actions: 'ride_completed', 'referral', 'registration'."
+          },
+          "response": []
+        },
+        {
+          "name": "Process Reward Action (Registration)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"actionType\": \"registration\",\n  \"accountableType\": \"User\",\n  \"accountableId\": 1,\n  \"metadata\": {\n    \"source\": \"mobile_app\",\n    \"referredBy\": null\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/rewards/process-action",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "rewards", "process-action"]
+            },
+            "description": "Process registration reward action. Awards points for new user registration."
+          },
+          "response": []
+        },
+        {
+          "name": "Process Reward Action (Referral)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"actionType\": \"referral\",\n  \"accountableType\": \"User\",\n  \"accountableId\": 1,\n  \"metadata\": {\n    \"referredUserId\": 10,\n    \"referredUserName\": \"Jane Doe\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/rewards/process-action",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "rewards", "process-action"]
+            },
+            "description": "Process referral reward action. Awards points when a user successfully refers someone."
+          },
+          "response": []
+        },
+        {
+          "name": "Redeem Rewards",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"accountableType\": \"User\",\n  \"accountableId\": 1,\n  \"serviceType\": \"taxi\",\n  \"serviceName\": \"Gozolt Taxi\",\n  \"sourceType\": \"RideRequest\",\n  \"sourceId\": 456,\n  \"rideAmount\": 1000,\n  \"coinsToRedeem\": 50\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/rewards/redeem",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "rewards", "redeem"]
+            },
+            "description": "Redeem reward coins for discount on a service/ride. Converts coins to cash discount (e.g., 50 coins = 500 discount). Called by Laravel when user redeems rewards."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Reward Balance",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/rewards/balance/:accountableType/:accountableId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "rewards", "balance", ":accountableType", ":accountableId"],
+              "variable": [
+                {
+                  "key": "accountableType",
+                  "value": "User",
+                  "description": "Account type (User, Driver, etc.)"
+                },
+                {
+                  "key": "accountableId",
+                  "value": "1",
+                  "description": "Account ID"
+                }
+              ]
+            },
+            "description": "Get reward account balance for a user or driver. Returns points balance, level, and equivalent cash value."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Transaction History",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/rewards/transactions/:accountableType/:accountableId?page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "rewards", "transactions", ":accountableType", ":accountableId"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number (optional)"
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Items per page (optional)"
+                }
+              ],
+              "variable": [
+                {
+                  "key": "accountableType",
+                  "value": "User",
+                  "description": "Account type (User, Driver, etc.)"
+                },
+                {
+                  "key": "accountableId",
+                  "value": "1",
+                  "description": "Account ID"
+                }
+              ]
+            },
+            "description": "Get paginated transaction history for a reward account. Shows all earned and redeemed rewards with metadata."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Reward Rule",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"actionType\": \"ride_completed\",\n  \"serviceType\": \"taxi\",\n  \"pointsAwarded\": 10,\n  \"description\": \"Earn 10 coins for every completed taxi ride\",\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/rewards/rules",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "rewards", "rules"]
+            },
+            "description": "Create a new reward rule. Defines how many points to award for specific actions. Admin only endpoint."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Reward Rule (Registration)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"actionType\": \"registration\",\n  \"pointsAwarded\": 100,\n  \"description\": \"Welcome bonus: 100 coins for new user registration\",\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/rewards/rules",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "rewards", "rules"]
+            },
+            "description": "Create a registration reward rule. Awards points when a new user signs up."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Reward Rule (Referral)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"actionType\": \"referral\",\n  \"pointsAwarded\": 200,\n  \"description\": \"Earn 200 coins for each successful referral\",\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/rewards/rules",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "rewards", "rules"]
+            },
+            "description": "Create a referral reward rule. Awards points when a user successfully refers someone."
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Reward Rules",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/rewards/rules",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "rewards", "rules"]
+            },
+            "description": "Get all reward rules. Admin only endpoint."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Active Reward Rules",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/rewards/rules?isActive=true",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "rewards", "rules"],
+              "query": [
+                {
+                  "key": "isActive",
+                  "value": "true",
+                  "description": "Filter by active status"
+                }
+              ]
+            },
+            "description": "Get only active reward rules."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Reward Rule",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pointsAwarded\": 15,\n  \"description\": \"Updated: Earn 15 coins for every completed taxi ride\",\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/rewards/rules/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "rewards", "rules", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "Rule ID"
+                }
+              ]
+            },
+            "description": "Update an existing reward rule. Partial update supported. Admin only endpoint."
+          },
+          "response": []
+        },
+        {
+          "name": "Deactivate Reward Rule",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"isActive\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/rewards/rules/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "rewards", "rules", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "Rule ID"
+                }
+              ]
+            },
+            "description": "Deactivate a reward rule without deleting it."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Reward Rule",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/rewards/rules/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "rewards", "rules", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "Rule ID"
+                }
+              ]
+            },
+            "description": "Permanently delete a reward rule. Admin only endpoint."
+          },
+          "response": []
+        }
+      ],
+      "description": "Reward system endpoints for managing reward accounts, transactions, and rules. Supports earning rewards for actions (rides, referrals, registration) and redeeming rewards for discounts."
     }
   ],
   "variable": [

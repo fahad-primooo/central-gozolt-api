@@ -4,6 +4,7 @@ import { requestLogger } from './middlewares/logger.middleware';
 import userRoutes from './modules/user/user.routes';
 import phoneVerificationRoutes from './modules/phone-verification/phone-verification.routes.js';
 import authRoutes from './modules/auth/auth.routes';
+import rewardRoutes from './modules/rewards/rewards.routes.js';
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.get('/health', (_, res) => {
 app.use('/api/verification', phoneVerificationRoutes);
 app.use('/api', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/rewards', rewardRoutes);
 
 // Global error handler (always last)
 app.use(errorHandler);

@@ -5,7 +5,6 @@ import * as userValidation from './user.validation';
 
 const router = Router();
 
-
 router.post('/', validate(userValidation.createUserSchema), userController.createUser);
 router.get('/', validate(userValidation.getAllUsersSchema), userController.getAllUsers);
 router.get('/:id', validate(userValidation.getUserByIdSchema), userController.getUserById);

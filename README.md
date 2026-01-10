@@ -331,6 +331,7 @@ curl -X POST http://localhost:3000/api/users \
    - Commit is blocked if there are unfixable errors
 
 5. **Push your changes:**
+
    ```bash
    git push
    ```
