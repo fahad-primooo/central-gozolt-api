@@ -1,6 +1,7 @@
 import { prisma } from '../../lib/prisma';
 import RewardConversion from '../../utils/reward-conversion';
 import logger from '../../utils/logger';
+import { ApiError } from '../../utils/ApiError';
 
 export class RewardService {
   /**
@@ -81,6 +82,14 @@ export class RewardService {
   ) {
     const { sourceType, sourceId, metadata = {} } = options;
 
+    // Verify user exists first
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new ApiError(404, `User with ID ${userId} not found`);
+    }
     // Get or create reward account
     const account = await prisma.rewardAccount.upsert({
       where: {

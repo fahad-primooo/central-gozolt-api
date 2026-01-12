@@ -127,6 +127,13 @@ export class AuthService {
         where: { id: phoneVerification.id },
       });
 
+      await tx.rewardAccount.create({
+        data: {
+          userId: newUser.id,
+          pointsBalance: 0,
+        },
+      });
+
       return newUser;
     });
 
