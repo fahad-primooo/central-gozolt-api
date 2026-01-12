@@ -123,10 +123,10 @@ export class PhoneVerificationService {
   }
 
   /**
-   * Send OTP via Twilio Verify
+   * Send OTP via Twilio Verify (enqueued via BullMQ worker)
    */
   async sendOTP(phoneNumber: string, channel: 'whatsapp' | 'sms') {
-    return await twilioVerifyService.sendOTP(phoneNumber, channel);
+    return await twilioVerifyService.enqueueSendOTP(phoneNumber, channel);
   }
 
   /**

@@ -10,6 +10,7 @@
     "start": "node dist/server.js",
     "type-check": "tsc --noEmit",
     "type-check:watch": "tsc --noEmit --watch",
+    "worker": "tsx src/queue/worker.ts",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

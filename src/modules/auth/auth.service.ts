@@ -179,7 +179,7 @@ export class AuthService {
     });
 
     // 4. Send OTP via Twilio Verify
-    const result = await twilioVerifyService.sendOTP(fullPhoneNumber, channel);
+    const result = await twilioVerifyService.enqueueSendOTP(fullPhoneNumber, channel);
 
     if (!result.success) {
       throw new ApiError(500, `Failed to send ${channel} OTP`, { error: result.message });
