@@ -1,5 +1,7 @@
 import twilio from 'twilio';
 import logger from '../utils/logger.js';
+import { enqueue } from '../lib/queue.js';
+import { env } from '../config/env';
 
 interface TwilioVerifyConfig {
   accountSid: string;
@@ -72,6 +74,27 @@ export class TwilioVerifyService {
   }
 
   /**
+   * Enqueue an OTP send request instead of sending immediately.
+   * Returns immediately once the job is added to the queue.
+   */
+  async enqueueSendOTP(
+    phoneNumber: string,
+    channel: 'whatsapp' | 'sms' = 'whatsapp'
+  ): Promise<SendOTPResult> {
+    try {
+      await enqueue(
+        'send-otp',
+        { phoneNumber, channel },
+        { attempts: 3, backoff: { type: 'exponential', delay: 1000 } }
+      );
+      return { success: true, message: 'OTP enqueue request accepted' };
+    } catch (error: any) {
+      logger.error(`Failed to enqueue send-otp job: ${error.message}`);
+      return { success: false, message: error.message || 'Failed to enqueue OTP' };
+    }
+  }
+
+  /**
    * Verify OTP code via Twilio Verify
    * @param phoneNumber - Full phone number with country code
    * @param code - The OTP code to verify
@@ -112,9 +135,9 @@ export class TwilioVerifyService {
 
 // Export singleton instance
 const twilioVerifyService = new TwilioVerifyService({
-  accountSid: process.env.TWILIO_SID || '',
-  authToken: process.env.TWILIO_AUTH_TOKEN || '',
-  verifyServiceSid: process.env.TWILIO_VERIFY_SERVICE_SID || '',
+  accountSid: env.twilioSid || '',
+  authToken: env.twilioAuthToken || '',
+  verifyServiceSid: env.twilioVerifyServiceSid || '',
 });
 
 export default twilioVerifyService;
