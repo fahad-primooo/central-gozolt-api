@@ -39,23 +39,9 @@ export class UserService {
     });
 
     if (existingUser) {
-      throw new ApiError(400, 'User with this email, username, or phone already exists');
+      // throw new ApiError(400, 'User with this email, username, or phone already exists');
+      return existingUser;
     }
-
-    const phoneVerified = await prisma.phoneVerification.findFirst({
-      where: {
-        countryCode: data.countryCode,
-        phoneNumber: data.phoneNumber,
-        verified: true,
-      },
-    });
-
-    if (!phoneVerified) {
-      throw new ApiError(400, 'Phone number not verified. Please complete OTP verification first.');
-    }
-
-    // Hash password
-    const hashedPassword = await bcrypt.hash(data.password, 10);
 
     // Generate display name
     const displayName = `${data.firstName} ${data.lastName}`;
@@ -70,10 +56,9 @@ export class UserService {
         email: data.email,
         countryCode: data.countryCode,
         phoneNumber: data.phoneNumber,
-        password: hashedPassword,
         avatar: data.avatar,
         bio: data.bio,
-        phoneVerified: true, // Since they completed OTP verification
+        phoneVerified: true,
         phoneVerifiedAt: new Date(),
       },
       select: {
